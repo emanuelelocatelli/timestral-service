@@ -1,0 +1,12 @@
+fastapi>=0.115.0,<1
+uvicorn[standard]>=0.34.0,<1
+pydantic>=2.10.0,<3
+pydantic-settings>=2.7.0,<3
+python-dotenv>=1.0.1,<2
+numpy>=2.0,<3
+
+# Installed from the CPU wheel in the Dockerfile before this file, so pip
+# keeps that build instead of pulling a CUDA wheel.
+torch==2.14.0
+
+timestral @ git+https://github.com/mistralai/timestral.git

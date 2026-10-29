@@ -1,0 +1,12 @@
+services:
+  timestral:
+    build: .
+    ports:
+      - "8003:8003"
+    env_file:
+      - .env
+    volumes:
+      - timestral-data:/app/data
+
+volumes:
+  timestral-data:

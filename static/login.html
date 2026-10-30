@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Timestral — accesso</title>
+  <link rel="stylesheet" href="/static/admin.css">
+</head>
+<body>
+  <main class="login">
+    <form id="login-form">
+      <h1>Timestral</h1>
+      <p>Pannello API e whitelist</p>
+      <label>Email<input type="email" name="email" required autocomplete="username"></label>
+      <label>Password<input type="password" name="password" required autocomplete="current-password"></label>
+      <button type="submit">Entra</button>
+      <p id="error" class="error" hidden></p>
+    </form>
+  </main>
+  <script>
+    document.getElementById("login-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const error = document.getElementById("error");
+      error.hidden = true;
+      const response = await fetch("/admin/api/login", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({email: form.email.value, password: form.password.value}),
+      });
+      if (response.ok) {
+        window.location.href = "/admin";
+        return;
+      }
+      error.hidden = false;
+      error.textContent = "Email o password non validi.";
+    });
+  </script>
+</body>
+</html>

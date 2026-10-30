@@ -4,12 +4,15 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
 
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, field_validator
 
+from admin import router as admin_router
 from config import get_settings
+from database import ensure_plain_token, init_database, seed_default_ips
 from engine import PredictionResult, TimestralPredictor
+from security import SecurityMiddleware
 
 settings = get_settings()
 logging.basicConfig(
@@ -26,6 +29,11 @@ predictor.torch_num_threads = settings.torch_num_threads
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    app.state.started_at = datetime.now(timezone.utc)
+    app.state.predictor = predictor
+    init_database()
+    seed_default_ips()
+    ensure_plain_token("price-candles", get_settings().api_token)
     predictor.load_model()
     yield
     logger.info("Shutting down Timestral service")
@@ -36,17 +44,9 @@ app = FastAPI(
     version=settings.service_version,
     lifespan=lifespan,
 )
-
-
-@app.middleware("http")
-async def require_token(request: Request, call_next):
-    token = (get_settings().api_token or "").strip()
-    if token and request.url.path.startswith("/predict"):
-        header = request.headers.get("authorization", "")
-        presented = header[7:].strip() if header.lower().startswith("bearer ") else ""
-        if presented != token:
-            return JSONResponse(status_code=401, content={"detail": "Invalid or missing bearer token"})
-    return await call_next(request)
+app.add_middleware(SecurityMiddleware)
+app.include_router(admin_router)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 class PredictRequest(BaseModel):

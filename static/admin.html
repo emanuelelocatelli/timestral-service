@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Timestral — API</title>
+  <link rel="stylesheet" href="/static/admin.css">
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Timestral</h1>
+      <p id="status-line">Caricamento…</p>
+    </div>
+    <button type="button" id="logout">Esci</button>
+  </header>
+  <main>
+    <section>
+      <h2>Whitelist IP</h2>
+      <p class="hint">Con almeno un indirizzo, <code>/predict</code> accetta solo questi client. Lista vuota = aperto. Dietro Traefik conta l'IP reale, non quello del proxy.</p>
+      <form id="ip-form" class="row">
+        <input name="ip_address" placeholder="203.0.113.10" required>
+        <input name="description" placeholder="descrizione">
+        <button type="submit">Aggiungi</button>
+      </form>
+      <table>
+        <thead><tr><th>IP</th><th>Descrizione</th><th></th></tr></thead>
+        <tbody id="ips"></tbody>
+      </table>
+    </section>
+    <section>
+      <h2>Token API</h2>
+      <p class="hint">Il valore completo compare una sola volta, alla creazione. price_candles usa il token già importato all'avvio.</p>
+      <form id="token-form" class="row">
+        <input name="name" placeholder="nome del token" required>
+        <button type="submit">Genera</button>
+      </form>
+      <p id="fresh-token" class="token" hidden></p>
+      <table>
+        <thead><tr><th>Nome</th><th>Prefisso</th><th>Stato</th><th></th></tr></thead>
+        <tbody id="tokens"></tbody>
+      </table>
+    </section>
+  </main>
+  <script src="/static/admin.js"></script>
+</body>
+</html>
